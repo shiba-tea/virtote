@@ -75,4 +75,5 @@ td textarea{
   vertical-align: middle;
   box-sizing: border-box;
   background: none;
+  resize: none;
 }

@@ -8,154 +8,38 @@
   <body>
     <h1>買い物メモ</h1>
 
-      <div id="wrapper">
-        <div id="input-area">
-          <h2>買うもの</h2>
-          <form>
-            品目：<input type="text" class="text-input" id="input-item" placeholder="林檎"><br>
-            数量：<input type="text" class="text-input" id="input-quantity" placeholder="１個"><br>
-            メモ：<textarea class="text-input" id="input-memo" placeholder="アップルパイの材料"></textarea><br>
-            <input type="button" value="追加" id="input-button">
-          </form>
-        </div>
-
-        <div id="data-area">
-          <h2>リスト</h2>
-          <input type="button" value="編集" id="edit-button"><br>
-          <p>
-            購入済みの品物を削除する
-            <input type="button" value="実行" id="delete-button">
-          </p>
-
-          <table>
-            <thead>
-              <tr>
-                <th>購入済</th><th>品目</th><th>数量</th><th>備考</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>じゃがいも</td><td>１個</td><td>メークイン</td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>たまねぎ</td><td>１個</td><td>多ければ多いほど良い</td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>にんじん</td><td>１本</td><td></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>鶏肉</td><td>３００g</td><td>もも</td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>カレールー</td><td>１箱</td><td>中辛</td>
-              </tr>
-            </tbody>
-          </table>
-
-        </div>
+    <div id="wrapper">
+      <div id="input-area">
+        <h2>買うもの</h2>
+        <form>
+          品目：<input type="text" class="text-input" id="input-item" placeholder="林檎"><br>
+          数量：<input type="text" class="text-input" id="input-quantity" placeholder="１個"><br>
+          メモ：<textarea class="text-input" id="input-memo" placeholder="アップルパイの材料"></textarea><br>
+          <input type="button" value="追加" id="input-button">
+        </form>
       </div>
 
-      <script>
-        let dataArea = document.getElementById("data-area");
-        let dataList = document.getElementsByTagName("tbody")[0];
-        let inputItem = document.getElementById("input-item");
-        let inputQuantity = document.getElementById("input-quantity");
-        let inputMemo = document.getElementById("input-memo"); 
-        const inputButton = document.getElementById("input-button");
-        const editButton = document.getElementById("edit-button");
-        const deleteButton = document.getElementById("delete-button");
+      <div id="data-area">
+        <h2>リスト</h2>
+        <input type="button" value="編集" id="edit-button"><br>
+        <p>
+          購入済みの品物を削除する
+          <input type="button" value="実行" id="delete-button">
+        </p>
 
-        // 入力内容を取得
-        function getData(){
-          return{
-          item : inputItem.value,
-          quantity : inputQuantity.value,
-          memo : inputMemo.value
-        }}
+        <table>
+          <thead>
+            <tr>
+              <th>購入済</th><th>品目</th><th>数量</th><th>備考</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
 
-        // localstrageに保存
+      </div>
+    </div>
 
-        // リストに書込み
-        function listEdit(){
-
-        }
-
-        // 追加処理
-        inputButton.addEventListener("click",function(){
-          if(inputItem.value === ""){
-            console.log("入力無し")
-            return; 
-          }
-            let data = getData();
-            console.log("品目" + data.item);
-            console.log("数量" + data.quantity);
-            console.log("備考" + data.memo);
-
-            inputItem.value = "";
-            inputQuantity.value = "";
-            inputMemo.value = "";
-
-            dataList.innerHTML +=
-              "<tr><td><input type='checkbox'></td><td>" + data.item + "</td><td>" + data.quantity + "</td><td>" + data.memo + "</td></tr>"; 
-        });
-
-        // 編集
-        let editing = false
-        editButton.addEventListener("click",function(){
-          if (editing === false){
-            for (let i = 0; i < dataList.rows.length; i++) {
-              let rows = dataList.rows[i];
-
-              let itemCell = rows.cells[1];
-              let quantityCell = rows.cells[2];
-              let memoCell = rows.cells[3];
-
-              let item = itemCell.textContent;
-              let quantity = quantityCell.textContent;
-              let memo = memoCell.textContent;
-
-              dataList.rows[i].cells[1].innerHTML = ("<input type='text' value=" + item + ">");
-              dataList.rows[i].cells[2].innerHTML = ("<input type='text' value=" + quantity + ">");
-              dataList.rows[i].cells[3].innerHTML = ("<textarea>" + memo + "</textarea>");
-
-              editing = true;
-              editButton.value = "保存";
-            }
-          } else {
-
-          // 編集終了/保存
-            for(let i = 0; i < dataList.rows.length; i++){
-              let rows = dataList.rows[i];
-
-              let item = rows.cells[1].querySelector("input").value;
-              let quantity = rows.cells[2].querySelector("input").value;
-              let memo = rows.cells[3].querySelector("textarea").value;
-
-              rows.cells[1].textContent = item;
-              rows.cells[2].textContent = quantity;
-              rows.cells[3].textContent = memo;
-            }
-
-            editButton.value = "編集";
-            editing = false;
-          }
-        });
-
-        // 購入済削除
-        deleteButton.addEventListener("click",function(){
-          // 1行ずつ購入済みチェックの確認/入っていれば行を削除
-          for (let i = dataList.rows.length - 1; i >= 0; i--) {
-            let checkbox = dataList.rows[i].cells[0].querySelector("input");
-            if (checkbox.checked) {
-              dataList.deleteRow(i);
-            }
-          }
-        });
-      </script>
+    <script src="script.js"></script>
   </body>
 </html>
