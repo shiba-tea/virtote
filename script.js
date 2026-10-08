@@ -1,137 +1,167 @@
-let dataArea = document.getElementById("data-area");
 let dataList = document.getElementsByTagName("tbody")[0];
-let inputItem = document.getElementById("input-item");
-let inputQuantity = document.getElementById("input-quantity");
-let inputMemo = document.getElementById("input-memo"); 
 const inputButton = document.getElementById("input-button");
 const editButton = document.getElementById("edit-button");
 const deleteButton = document.getElementById("delete-button");
+let inputData; // リストに描画するデータ(オブジェクト)
+let editing = false; // 編集中フラグ
+
 
 // サンプルデータ
-let sampleData = [
-  ["じゃがいも", "1個", "メークイン"],
-  ["たまねぎ", "1個", "多ければ多いほど良い"],
-  ["にんじん", "1本", ""],
-  ["鶏肉", "300g", "もも"],
-  ["カレールー", "1箱", "中辛"]
+const sampleData = [
+  {item:"じゃがいも", quantity:"1個", memo:"メークイン"},
+  {item:"たまねぎ", quantity:"1個", memo:"多ければ多いほど良い"},
+  {item:"にんじん", quantity:"1本", memo:""},
+  {item:"鶏肉", quantity:"300g", memo:"もも"},
+  {item:"カレールー", quantity:"1箱", memo:"中辛"}
 ];
 
-// 入力内容を取得
-function getData(){
-  return{
-  item : inputItem.value,
-  quantity : inputQuantity.value,
-  memo : inputMemo.value
-}}
-
-// リストに書込み
-function listEdit(){
+// LocalStorageへの保存
+function saveData(){
+  localStorage.setItem("shoppingData", JSON.stringify(shoppingData));
 }
+
+// LocalStorageからの削除
+function deleteData(){
+  localStorage.removeItem("shoppingData");
+}
+
+
+// リスト描画
+function renderList(inputdata){
+  let renderItem;
+  if(!editing){ //編集中ではない リスト描画/編集枠描画
+      renderItem =`
+        <td>${inputdata.item}</td>
+        <td>${inputdata.quantity}</td>
+        <td>${inputdata.memo}</td>
+      `;
+  } else {
+      renderItem =`
+        <td><input type="text" value="${inputdata.item}"></td>
+        <td><input type="text" value="${inputdata.quantity}"></td>
+        <td><textarea>${inputdata.memo}</textarea></td>
+      `;
+  }
+  dataList.innerHTML +=
+    `<tr><td><input type="checkbox" ${inputdata.checked ? "checked" : ""}></td>${renderItem}</tr>`;
+
+    let checkbox =  dataList.rows[dataList.rows.length - 1]
+    .cells[0]
+    .querySelector("input");
+
+    checkbox.addEventListener("change", function(){
+      inputdata.checked = this.checked;
+      if( !editing && shoppingData.length > 0){
+        saveData();
+      }
+    });
+  }
+
 
 // 初期表示
+  //localstorageデータを配列に戻して格納/なければ空配列を格納
 let shoppingData = JSON.parse(localStorage.getItem("shoppingData")) || [];
-if( shoppingData.length > 0){
-  //LocalStrageがある
-  for (let i = 0; i < shoppingData.length; i++) {
-    dataList.innerHTML +=
-      "<tr><td><input type='checkbox'></td><td>" + shoppingData[i].item +
-      "</td><td>" + shoppingData[i].quantity + "</td><td>" +
-      shoppingData[i].memo + "</td></tr>";
-  }
-} else {
-  //LocalStrageがない
-  for(let i = 0; i < sampleData.length; i++){
-  dataList.innerHTML +=
-    "<tr><td><input type='checkbox'></td><td>" + sampleData[i][0] +
-    "</td><td>" + sampleData[i][1] + "</td><td>" + sampleData[i][2] + "</td></tr>"; 
-  }
+let displayData = shoppingData.length > 0 ? shoppingData : sampleData; // LocalStorageのデータ有無確認
+for (let i = 0; i < displayData.length; i++) { 
+inputData = displayData[i];
+  renderList(inputData);
 }
 
-// 追加処理
+// 追加処理関数
+let inputItem = document.getElementById("input-item");
+let inputQuantity = document.getElementById("input-quantity");
+let inputMemo = document.getElementById("input-memo"); 
+
+function addItem(){
+  inputData = {
+    item : inputItem.value,
+    quantity : inputQuantity.value,
+    memo : inputMemo.value
+  }
+
+  shoppingData.push(inputData);
+
+  if(!editing){ // 編集中でなければ
+  saveData();
+  }
+
+  inputItem.value = ""; //入力枠を空にする
+  inputQuantity.value = "";
+  inputMemo.value = "";
+
+  renderList(inputData);
+}
+
+// 追加 クリックイベント
 inputButton.addEventListener("click",function(){
-  if(inputItem.value === ""){
-    console.log("入力無し") // 後で消す
+  if(inputItem.value === ""){ //入力欄が空で追加ボタンを押されても処理しない
     return; 
   }
-  let data = getData();
-
   // Localデータがない/サンプルデータが表示されていたら消す
   if( shoppingData.length === 0){
     dataList.innerHTML = "";
   }
-
-  // 入力内容の保存
-  shoppingData.push(data);
-  localStorage.setItem("shoppingData", JSON.stringify(shoppingData));
-
-  console.log("品目：" + data.item);
-  console.log("数量：" + data.quantity);
-  console.log("備考：" + data.memo);
-
-  inputItem.value = "";
-  inputQuantity.value = "";
-  inputMemo.value = "";
-
-  dataList.innerHTML +=
-    "<tr><td><input type='checkbox'></td><td>" + data.item +
-    "</td><td>" + data.quantity + "</td><td>" + data.memo + "</td></tr>"; 
+  addItem();
 });
 
-// 編集
-let editing = false
-editButton.addEventListener("click",function(){
-  if (editing === false){
-    for (let i = 0; i < dataList.rows.length; i++) {
-      let rows = dataList.rows[i];
-
-      let itemCell = rows.cells[1];
-      let quantityCell = rows.cells[2];
-      let memoCell = rows.cells[3];
-
-      let item = itemCell.textContent;
-      let quantity = quantityCell.textContent;
-      let memo = memoCell.textContent;
-
-      dataList.rows[i].cells[1].innerHTML = ("<input type='text' value=" + item + ">");
-      dataList.rows[i].cells[2].innerHTML = ("<input type='text' value=" + quantity + ">");
-      dataList.rows[i].cells[3].innerHTML = ("<textarea>" + memo + "</textarea>");
-
-      editing = true;
-      editButton.value = "保存";
-    }
-  } else {
-
-  // 編集終了/保存
-    for(let i = 0; i < dataList.rows.length; i++){
-      let rows = dataList.rows[i];
-
-      let item = rows.cells[1].querySelector("input").value;
-      let quantity = rows.cells[2].querySelector("input").value;
-      let memo = rows.cells[3].querySelector("textarea").value;
-
-      rows.cells[1].textContent = item;
-      rows.cells[2].textContent = quantity;
-      rows.cells[3].textContent = memo;
-    }
-
-    editButton.value = "編集";
-    editing = false;
-  }
-});
-
-// 購入済削除
+// 購入済削除　クリックイベント
 deleteButton.addEventListener("click",function(){
   // 1行ずつ購入済みチェックの確認/入っていれば行を削除
-  for (let i = dataList.rows.length - 1; i >= 0; i--) {
+  for (let i = dataList.rows.length - 1; i >= 0; i--) { //dataListの件数-1 新→旧へ
     let checkbox = dataList.rows[i].cells[0].querySelector("input");
-    if (checkbox.checked) {
-      dataList.deleteRow(i);
-      if(shoppingData.length > 0){
-        shoppingData.splice(i,1);
+    if (checkbox.checked) { // チェックボックスにチェックが入っている
+      dataList.deleteRow(i);  // リストの該当行を削除
+      if(shoppingData.length > 0){ // shoppingDataが1件以上
+        shoppingData.splice(i,1); //チェックされた行のデータを削除
       }
     }
   }
-  if(shoppingData.length > 0){
-    localStorage.setItem("shoppingData", JSON.stringify(shoppingData));
+  if(editing){
+    return;
+  }
+  if(!editing && shoppingData.length > 0){ // shoppingDataが１件以上あり編集中でない
+    saveData();
+  } else {
+    deleteData();
+  }
+});
+
+// 並べ替え クリックイベント
+
+
+// 編集 クリックイベント
+editButton.addEventListener("click",function(){
+  editing = !editing; // true:編集状態 false:閲覧状態
+  for (let i = 0; i < dataList.rows.length; i++) {  // リストの行だけ繰り返す
+    let row = dataList.rows[i]; // 行の格納
+    if (!editing){ // false 閲覧状態 入力枠から値を読んでセルへ
+      let item = row.cells[1].querySelector("input").value;
+      let quantity = row.cells[2].querySelector("input").value;
+      let memo = row.cells[3].querySelector("textarea").value;
+
+      if( shoppingData.length > 0){ // LocalStorageがあるとき、shoppingDataにデータを格納
+        shoppingData[i] = {
+          item: item,
+          quantity: quantity,
+          memo: memo,
+          checked: row.cells[0].querySelector("input").checked
+        };
+      }
+
+      row.cells[1].textContent = item;
+      row.cells[2].textContent = quantity;
+      row.cells[3].textContent = memo;
+
+    } else { // true 編集状態　 セルの中身を入力枠へ
+      row.cells[1].innerHTML = ("<input type='text' value=" + row.cells[1].textContent + ">");
+      row.cells[2].innerHTML = ("<input type='text' value=" + row.cells[2].textContent + ">");
+      row.cells[3].innerHTML = ("<textarea>" + row.cells[3].textContent + "</textarea>");
+    }
+  }
+  if(editing){ // 編集状態なら
+    editButton.value = "保存";
+  } else {
+    saveData();
+    editButton.value = "編集";
   }
 });
