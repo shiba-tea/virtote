@@ -1,4 +1,6 @@
+let dataArea = document.getElementById("data-area"); // 使わなければ消す
 let dataList = document.getElementsByTagName("tbody")[0];
+// const dataList = document.querySelectorAll("tbody tr");  //cssを扱うならquery
 const inputButton = document.getElementById("input-button");
 const editButton = document.getElementById("edit-button");
 const deleteButton = document.getElementById("delete-button");
@@ -9,7 +11,7 @@ let editing = false; // 編集中フラグ
 // サンプルデータ
 const sampleData = [
   {item:"じゃがいも", quantity:"1個", memo:"メークイン"},
-  {item:"たまねぎ", quantity:"1個", memo:"多ければ多いほど良い"},
+  {item:"たまねぎ", quantity:"1個", memo:"たくさん"},
   {item:"にんじん", quantity:"1本", memo:""},
   {item:"鶏肉", quantity:"300g", memo:"もも"},
   {item:"カレールー", quantity:"1箱", memo:"中辛"}
@@ -85,16 +87,22 @@ function addItem(){
   saveData();
   }
 
+  console.log("品目：" + inputData.item);  // 後で消す
+  console.log("数量：" + inputData.quantity);
+  console.log("備考：" + inputData.memo);
+
   inputItem.value = ""; //入力枠を空にする
   inputQuantity.value = "";
   inputMemo.value = "";
 
+  console.log(inputData);
   renderList(inputData);
 }
 
 // 追加 クリックイベント
 inputButton.addEventListener("click",function(){
   if(inputItem.value === ""){ //入力欄が空で追加ボタンを押されても処理しない
+    console.log("入力無し") // 後で消す
     return; 
   }
   // Localデータがない/サンプルデータが表示されていたら消す
@@ -111,7 +119,7 @@ deleteButton.addEventListener("click",function(){
     let checkbox = dataList.rows[i].cells[0].querySelector("input");
     if (checkbox.checked) { // チェックボックスにチェックが入っている
       dataList.deleteRow(i);  // リストの該当行を削除
-      if(shoppingData.length > 0){ // shoppingDataが1件以上
+      if(shoppingData.length > 0){ // shoppingDataが1件以上い
         shoppingData.splice(i,1); //チェックされた行のデータを削除
       }
     }
@@ -152,7 +160,7 @@ editButton.addEventListener("click",function(){
       row.cells[2].textContent = quantity;
       row.cells[3].textContent = memo;
 
-    } else { // true 編集状態　 セルの中身を入力枠へ
+    } else { // true 編集状態　 を入力枠へ
       row.cells[1].innerHTML = ("<input type='text' value=" + row.cells[1].textContent + ">");
       row.cells[2].innerHTML = ("<input type='text' value=" + row.cells[2].textContent + ">");
       row.cells[3].innerHTML = ("<textarea>" + row.cells[3].textContent + "</textarea>");
@@ -165,3 +173,25 @@ editButton.addEventListener("click",function(){
     editButton.value = "編集";
   }
 });
+
+// 編集画面のinput枠のサイズ調整
+// 購入済みのチェックの有無を保存する
+  // checked: false //チェックしてない
+  // checked: true //チェックされている
+  // checkbox.checked でチェック状態を取得
+// 編集中の削除を許容するかどうか
+// 並べ替え
+// レイアウト調整
+  // リストが空になった時の横幅
+
+/*
+  ・入力枠　名前だけあれば追加できる/名前が入っていなければ反応しない
+  ・編集ボタン　押したらフラグ管理で編集/通常表示にリストが切り替わる
+  ・編集中の追加　サンプルが消える
+
+*/
+
+// localstrage
+// https://qiita.com/fe2030/items/4fd6f6e35b34cde08e2d
+// 配列とオブジェクトの違い
+// https://qiita.com/j_1210/items/8b0899a02505a611f305

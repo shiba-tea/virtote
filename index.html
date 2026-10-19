@@ -2,46 +2,48 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style.css" rel="stylesheet">
-    <title>買い物メモ</title>
+    <title>お買い物メモアプリ-Virtote</title>
   </head>
+  <header>
+    <p id="app-label">お買い物メモアプリ</p>
+    <h1><span id="title">Virtote</span></h1>
+    <div id="header-buttons">
+      <a href="help.html" id="help-link">? 使い方</a>
+      <input type="button" value="編集" id="edit-button">
+      <input type="button" value="削除" id="delete-button">
+    </div>
+  </header>
   <body>
-    <h1><span id="title">買い物メモ</span></h1>
 
-    <div id="wrapper">
       <div id="input-area">
-        <h2>買うもの</h2>
-        <form>
-          品目：<input type="text" class="text-input" id="input-item" placeholder="林檎"><br>
-          数量：<input type="text" class="text-input" id="input-quantity" placeholder="１個"><br>
-          メモ：<textarea class="text-input" id="input-memo" placeholder="アップルパイの材料"></textarea><br>
+        <div class="input-row">
+          品目：<input type="text" class="text-input" id="input-item" placeholder="ほしいもの">
+          数量：<input type="text" class="text-input" id="input-quantity" placeholder="１個">
+        </div>
+        <div class="input-row">
+          メモ：<textarea class="text-input" id="input-memo" placeholder="料理名や用途など"></textarea><br>
           <input type="button" value="追加" id="input-button">
-        </form>
+        </div>
       </div>
 
       <div id="data-area">
-        <h2>リスト</h2>
-        <input type="button" value="編集" id="edit-button"><br>
-        <p>
-          購入済みの品物を削除する
-          <input type="button" value="実行" id="delete-button">
-        </p>
-
         <table>
           <thead>
             <tr>
-              <th>済</th><th>品目</th><th>数量</th><th>備考</th>
+              <th>済</th><th>品目</th><th>数量</th><th>メモ</th>
             </tr>
           </thead>
           <tbody>
           </tbody>
         </table>
-
       </div>
-    </div>
+
+      <footer>
+      <p id="copyright">&copy; 2026 Virtote.</p>
+    </footer>
 
     <script src="script.js"></script>
   </body>
 </html>
-
-<!-- 26/10/03作成開始 -->
